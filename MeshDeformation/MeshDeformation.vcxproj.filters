@@ -21,12 +21,24 @@
     <ClCompile Include="MeshLoader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureLoader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MeshLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="global.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderLoader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureLoader.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

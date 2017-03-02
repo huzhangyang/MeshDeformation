@@ -9,7 +9,7 @@ void MeshLoader::LoadObj(string filename)
 		{
 			string header;
 			file >> header;
-			cout << "Read from file: " << header << endl;
+			//cout << "Read from file: " << header << endl;
 
 			if (header.compare("v") == 0) 
 			{
@@ -47,13 +47,44 @@ void MeshLoader::LoadObj(string filename)
 				normalIndices.push_back(stoi(arg3[2]));
 			}
 		}
+
 		cout << "File Read Complete." << endl;
+
+		for (unsigned int i = 0; i<vertexIndices.size(); i++)
+		{
+			unsigned int vertexIndex = vertexIndices[i];
+			unsigned int uvIndex = uvIndices[i];
+			unsigned int normalIndex = normalIndices[i];
+
+			vec3 vertex = temp_vertices[vertexIndex - 1];
+			vec2 uv = temp_uvs[uvIndex - 1];
+			vec3 normal = temp_normals[normalIndex - 1];
+
+			out_vertices.push_back(vertex);
+			out_uvs.push_back(uv);
+			out_normals.push_back(normal);
+		}
 	}
 	else
 	{
 		cout << "File Open Failed." << endl;
 		return;
 	}
+}
+
+vector<vec3> MeshLoader::GetVertices()
+{
+	return out_vertices;
+}
+
+vector<vec2> MeshLoader::GetUVs()
+{
+	return out_uvs;
+}
+
+vector<vec3> MeshLoader::GetNormals()
+{
+	return out_normals;
 }
 
 vector<string> MeshLoader::split(string& s, const char* delim)
