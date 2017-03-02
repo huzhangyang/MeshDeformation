@@ -142,12 +142,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="InputController.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MeshLoader.cpp" />
     <ClCompile Include="ShaderLoader.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InputController.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="MeshLoader.h" />
     <ClInclude Include="ShaderLoader.h" />

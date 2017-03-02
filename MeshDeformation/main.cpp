@@ -2,6 +2,7 @@
 #include "MeshLoader.h"
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
+#include "InputController.h"
 
 // The MAIN function, from here we start the application and run the game loop
 int main()
@@ -50,17 +51,17 @@ int main()
 
 		// Use our shader
 		glUseProgram(programID);
-		/*
+		
 		// Compute the MVP matrix from keyboard and mouse input
-		computeMatricesFromInputs();
-		glm::mat4 ProjectionMatrix = getProjectionMatrix();
-		glm::mat4 ViewMatrix = getViewMatrix();
-		glm::mat4 ModelMatrix = glm::mat4(1.0);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		InputController::ComputeMatricesFromInputs(window);
+		mat4 ProjectionMatrix = InputController::GetProjectionMatrix();
+		mat4 ViewMatrix = InputController::GetViewMatrix();
+		mat4 ModelMatrix = mat4(1.0);
+		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
 
 		// Send our transformation to the currently bound shader, 
 		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);*/
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		// Bind our texture in Texture Unit 0
 		glActiveTexture(GL_TEXTURE0);
