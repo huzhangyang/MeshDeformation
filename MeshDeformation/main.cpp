@@ -7,106 +7,73 @@
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
-	MeshLoader* meshLoader = new MeshLoader();
-	meshLoader->LoadObj("c://test.obj");
-	auto vertices = meshLoader->GetVertices();
-	auto uvs = meshLoader->GetUVs();
-
+	//Init GLFW
 	glfwInit();
-
+	glfwWindowHint(GLFW_SAMPLES, 4);// anti-aliasing
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Mesh", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
+	//Init GLEW
 	glewExperimental = GL_TRUE;
 	glewInit();
-
-	// Create and compile our GLSL program from the shaders
-	GLuint programID = ShaderLoader::LoadShader("TransformVertexShader.vertexshader", "TextureFragmentShader.fragmentshader");
-
-	// Get a handle for our "MVP" uniform
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	//Load Mesh
+	MeshLoader* meshLoader = new MeshLoader();
+	meshLoader->LoadObj("Rabbit.obj");
+	auto vertices = meshLoader->GetVertices();
+	auto uvs = meshLoader->GetUVs();
+	//Load Shader
+	GLuint programID = ShaderLoader::LoadShader("vertex.shader", "fragment.shader");
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-
-	// Load the texture
-	GLuint Texture = TextureLoader::LoadDDS("uvmap.DDS");
-
-	// Get a handle for our "myTextureSampler" uniform
+	//Load Texture
+	GLuint Texture = TextureLoader::LoadDDS("Rabbit.dds");
 	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
-	
+	//Load
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(vec2), &uvs[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	do 
-	{
-		// Clear the screen
+	GLuint matrix_location = glGetUniformLocation(programID, "MVP");
+	GLuint model_matrix_location = glGetUniformLocation(programID, "M");
+	GLuint view_matrix_location = glGetUniformLocation(programID, "V");
+	//Render
+	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Use our shader
 		glUseProgram(programID);
-		
-		// Compute the MVP matrix from keyboard and mouse input
+
 		InputController::ComputeMatricesFromInputs(window);
 		mat4 ProjectionMatrix = InputController::GetProjectionMatrix();
 		mat4 ViewMatrix = InputController::GetViewMatrix();
 		mat4 ModelMatrix = mat4(1.0);
 		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		glUniformMatrix4fv(matrix_location, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, &ViewMatrix[0][0]);
 
-		// Send our transformation to the currently bound shader, 
-		// in the "MVP" uniform
-		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-
-		// Bind our texture in Texture Unit 0
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, Texture);
-		// Set our "myTextureSampler" sampler to user Texture Unit 0
-		glUniform1i(TextureID, 0);
-
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-			0,                  // attribute
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-		);
-
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(
-			1,                                // attribute
-			2,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-
-		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-
-		// Swap buffers
-		glfwSwapBuffers(window);
 		glfwPollEvents();
-
+		glfwSwapBuffers(window);
 	}
-	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
+
+	//Cleanup
+	glDeleteBuffers(1, &vertexbuffer);
+	glDeleteBuffers(1, &uvbuffer);
+	glDeleteProgram(programID);
+	glDeleteTextures(1, &TextureID);
 
 	glfwTerminate();
 	return 0;
 }
-
