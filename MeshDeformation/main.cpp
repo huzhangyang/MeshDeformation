@@ -12,7 +12,6 @@ int main()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Mesh", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Init GLEW
 	glewInit();
@@ -52,12 +51,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
 
-		// Compute the MVP matrix
+		// Set Camera
 		InputController::ComputeMatricesFromInputs(window);
-		mat4 ProjectionMatrix = InputController::GetProjectionMatrix();
-		mat4 ViewMatrix = InputController::GetViewMatrix();
-		mat4 ModelMatrix = mat4(1.0);
-		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		mat4 MVP = InputController::GetMVP();
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		// Draw the triangle !

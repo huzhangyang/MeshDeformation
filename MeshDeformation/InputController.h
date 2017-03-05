@@ -6,7 +6,6 @@
 class InputController {
 public:
 	static void ComputeMatricesFromInputs(GLFWwindow* window);
-	static mat4 GetViewMatrix();
-	static mat4 GetProjectionMatrix();
+	static mat4 GetMVP();
 private:
 };
