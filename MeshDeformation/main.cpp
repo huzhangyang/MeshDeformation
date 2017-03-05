@@ -7,30 +7,32 @@
 // The MAIN function, from here we start the application and run the game loop
 int main()
 {
-	//Init GLFW
+	// Init GLFW
 	glfwInit();
-	glfwWindowHint(GLFW_SAMPLES, 4);// anti-aliasing
+	glfwWindowHint(GLFW_SAMPLES, 4);
 	GLFWwindow* window = glfwCreateWindow(1280, 720, "Mesh", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	//Init GLEW
-	glewExperimental = GL_TRUE;
+
+	// Init GLEW
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	//Load Mesh
+
+	// Load Mesh
 	MeshLoader* meshLoader = new MeshLoader();
 	meshLoader->LoadObj("Rabbit.obj");
 	auto vertices = meshLoader->GetVertices();
 	auto uvs = meshLoader->GetUVs();
-	//Load Shader
+
+	// Load Shader
 	GLuint programID = ShaderLoader::LoadShader("vertex.shader", "fragment.shader");
 	GLuint MatrixID = glGetUniformLocation(programID, "MVP");
-	//Load Texture
-	GLuint Texture = TextureLoader::LoadDDS("Rabbit.dds");
-	GLuint TextureID = glGetUniformLocation(programID, "myTextureSampler");
-	//Load
+
+	// Load Texture
+	GLuint TextureID = TextureLoader::LoadDDS("Rabbit.dds");
+
+	// Load it into a VBO
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -43,32 +45,30 @@ int main()
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(vec2), &uvs[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	GLuint matrix_location = glGetUniformLocation(programID, "MVP");
-	GLuint model_matrix_location = glGetUniformLocation(programID, "M");
-	GLuint view_matrix_location = glGetUniformLocation(programID, "V");
-	//Render
-	while (!glfwWindowShouldClose(window)) {
+	while(!glfwWindowShouldClose(window)) 
+	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUseProgram(programID);
 
+		// Compute the MVP matrix
 		InputController::ComputeMatricesFromInputs(window);
 		mat4 ProjectionMatrix = InputController::GetProjectionMatrix();
 		mat4 ViewMatrix = InputController::GetViewMatrix();
 		mat4 ModelMatrix = mat4(1.0);
 		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
-		glUniformMatrix4fv(matrix_location, 1, GL_FALSE, &MVP[0][0]);
-		glUniformMatrix4fv(model_matrix_location, 1, GL_FALSE, &ModelMatrix[0][0]);
-		glUniformMatrix4fv(view_matrix_location, 1, GL_FALSE, &ViewMatrix[0][0]);
+		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
+		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
-		glfwPollEvents();
+		// Swap buffers
 		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 
-	//Cleanup
+	// Cleanup
 	glDeleteBuffers(1, &vertexbuffer);
 	glDeleteBuffers(1, &uvbuffer);
 	glDeleteProgram(programID);
