@@ -1,13 +1,39 @@
 #include "InputController.h"
 
-vec3 position = vec3(2, 0.5, 0);
+vec3 position = vec3(1, 0.5, 0);
 float horizontalAngle = 4.71f;
 float verticalAngle = 0;
-float fov = 45.0f;
+float fov = 90.0f;
 float speed = 3.0f;
 
 static mat4 ViewMatrix;
 static mat4 ProjectionMatrix;
+
+void mouseCallback(GLFWwindow* window, int button, int action, int mods) 
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
+	{
+		//set a control point
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
+		cout << mouseX << ' ' << mouseY << endl;
+		vec3 pos = InputController::convertTo3DCoordinate(mouseX, mouseY);
+		cout << pos.x << ' ' << pos.y << ' ' << pos.z << endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT &&  action == GLFW_RELEASE)
+	{
+		//clear latest control point
+	}
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE &&  action == GLFW_RELEASE)
+	{
+		//clear all control points
+	}
+}
+
+void InputController::InitMouseCallback(GLFWwindow * window)
+{
+	glfwSetMouseButtonCallback(window, mouseCallback);
+}
 
 void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 {
@@ -64,13 +90,13 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 	}
 	// Reset
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		position = vec3(2, 0.5, 0);
+		position = vec3(1, 0.5, 0);
 		horizontalAngle = 4.71f;
 		verticalAngle = 0;
 	}
 
 	float FoV = fov;// - 5 * glfwGetMouseWheel();
-	ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.1f, 100.0f);
+	ProjectionMatrix = glm::perspective(FoV, SCREEN_WIDTH / (float)SCREEN_HEIGHT, 0.1f, 100.0f);
 	ViewMatrix = glm::lookAt(position, position + direction, up);
 
 	// For the next frame, the "last time" will be "now"
@@ -81,4 +107,20 @@ mat4 InputController::GetMVP()
 {
 	mat4 ModelMatrix = mat4(1.0);
 	return ProjectionMatrix * ViewMatrix * ModelMatrix;
+}
+
+vec3 InputController::convertTo3DCoordinate(double mouseX, double mouseY)
+{
+	double modelview[16], projection[16];
+	int viewport[4];
+	double winX, winY, winZ;
+	double object_x = 0, object_y = 0, object_z = 0;
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+	glGetDoublev(GL_PROJECTION_MATRIX, projection);
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	winX = mouseX;
+	winY = (float)viewport[3] - mouseY;
+	glReadPixels((GLint)mouseX, (GLint)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+	gluUnProject((GLdouble)winX, (GLdouble)winY, (GLdouble)winZ, modelview, projection, viewport, &object_x, &object_y, &object_z);
+	return vec3(object_x, object_y, object_z);
 }

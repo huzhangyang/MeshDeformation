@@ -10,8 +10,9 @@ int main()
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	GLFWwindow* window = glfwCreateWindow(1280, 720, "Mesh", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Mesh", NULL, NULL);
 	glfwMakeContextCurrent(window);
+	InputController::InitMouseCallback(window);
 
 	// Init GLEW
 	glewInit();

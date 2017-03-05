@@ -2,8 +2,6 @@
 
 GLuint TextureLoader::LoadDDS(string path)
 {
-	unsigned char header[124];
-
 	ifstream file(path, std::ios::binary);
 	if (file.is_open())
 	{
