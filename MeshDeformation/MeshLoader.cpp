@@ -21,6 +21,7 @@ void MeshLoader::LoadObj(string filename)
 			{
 				vec2 uv;
 				file >> uv.x >> uv.y;
+				uv.y = -uv.y; //need this?
 				temp_uvs.push_back(uv);
 			}
 			else if (header.compare("vn") == 0)
@@ -50,7 +51,7 @@ void MeshLoader::LoadObj(string filename)
 
 		cout << "File Read Complete." << endl;
 
-		for (unsigned int i = 0; i<vertexIndices.size(); i++)
+		for (unsigned int i = 0; i< vertexIndices.size(); i++)
 		{
 			unsigned int vertexIndex = vertexIndices[i];
 			unsigned int uvIndex = uvIndices[i];
