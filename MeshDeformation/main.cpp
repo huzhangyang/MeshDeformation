@@ -19,6 +19,9 @@ int main()
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Load Mesh
 	MeshLoader* meshLoader = new MeshLoader();
@@ -33,7 +36,7 @@ int main()
 	// Load Texture
 	GLuint TextureID = TextureLoader::LoadDDS("Rabbit.dds");
 
-	// Load it into a VBO
+	// Load into a VBO
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -48,6 +51,8 @@ int main()
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	while(!glfwWindowShouldClose(window)) 
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -60,6 +65,20 @@ int main()
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+
+		auto controlPoints = Deformation::GetControlPoints();
+		if (controlPoints.size() > 0)
+		{
+			/*GLuint cpbuffer;
+			glGenBuffers(1, &cpbuffer);
+			glBindBuffer(GL_ARRAY_BUFFER, cpbuffer);
+			glBufferData(GL_ARRAY_BUFFER, controlPoints.size() * sizeof(vec3), &controlPoints[0], GL_DYNAMIC_DRAW);
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+			glDrawArrays(GL_POINTS, 0, controlPoints.size());
+			glDisableVertexAttribArray(2);
+			glDeleteBuffers(1, &cpbuffer);*/
+		}
 
 		// Swap buffers
 		glfwSwapBuffers(window);

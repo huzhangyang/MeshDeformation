@@ -5,6 +5,7 @@
 class MeshLoader {
 public:
 	void LoadObj(string filename);
+	void LoadObj2D(string filename);
 	vector<vec3> GetVertices();
 	vector<vec2> GetUVs();
 	vector<vec3> GetNormals();

@@ -73,6 +73,49 @@ void MeshLoader::LoadObj(string filename)
 	}
 }
 
+void MeshLoader::LoadObj2D(string filename)
+{
+	ifstream file(filename);
+	if (file.is_open())
+	{
+		while (!file.eof())
+		{
+			string header;
+			file >> header;
+			//cout << "Read from file: " << header << endl;
+
+			if (header.compare("v") == 0)
+			{
+				vec3 vertex;
+				file >> vertex.x >> vertex.y >> vertex.z;
+				temp_vertices.push_back(vertex);
+			}
+			else if (header.compare("f") == 0)
+			{
+				int v1, v2, v3;
+				file >> v1 >> v2 >> v3;
+				vertexIndices.push_back(v1);
+				vertexIndices.push_back(v2);
+				vertexIndices.push_back(v3);
+			}
+		}
+
+		cout << "File Read Complete." << endl;
+
+		for (unsigned int i = 0; i< vertexIndices.size(); i++)
+		{
+			unsigned int vertexIndex = vertexIndices[i];
+			vec3 vertex = temp_vertices[vertexIndex - 1];
+			out_vertices.push_back(vertex);
+		}
+	}
+	else
+	{
+		cout << "File Open Failed." << endl;
+		return;
+	}
+}
+
 vector<vec3> MeshLoader::GetVertices()
 {
 	return out_vertices;

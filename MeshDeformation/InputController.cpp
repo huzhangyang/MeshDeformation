@@ -1,6 +1,6 @@
 #include "InputController.h"
 
-vec3 position = vec3(1, 0.5, 0);
+vec3 position = vec3(0.5, 0.5, 0);
 float horizontalAngle = 4.71f;
 float verticalAngle = 0;
 float fov = 90.0f;
@@ -26,6 +26,8 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 		cout << "World coordinate:" << world.x << ',' << world.y << endl;
 		vec3 pos = InputController::convertTo3DCoordinate(mouseX, mouseY);
 		cout << "3D coordinate:" << pos.x << ',' << pos.y << ',' << pos.z << endl;
+		//Deformation::AddControlPoint(vec3(world.x, world.y, 0));
+		Deformation::AddControlPoint(pos);
 	}
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE &&  action == GLFW_RELEASE)
 	{
@@ -94,9 +96,15 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 	}
 	// Reset
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		position = vec3(1, 0.5, 0);
+		position = vec3(0.5, 0.5, 0);
 		horizontalAngle = 4.71f;
 		verticalAngle = 0;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	float FoV = fov;// - 5 * glfwGetMouseWheel();

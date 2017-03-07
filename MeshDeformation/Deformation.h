@@ -5,7 +5,8 @@
 
 class Deformation {
 public:
-	static void AddControlPoint();
+	static void AddControlPoint(vec3 point);
 	static void ClearControlPoints();
+	static vector<vec3> GetControlPoints();
 private:
 };
