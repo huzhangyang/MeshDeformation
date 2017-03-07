@@ -3,6 +3,7 @@
 #include "ShaderLoader.h"
 #include "TextureLoader.h"
 #include "InputController.h"
+#include "Deformation.h"
 
 // The MAIN function, from here we start the application and run the game loop
 int main()

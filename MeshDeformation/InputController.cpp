@@ -13,20 +13,24 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
 	{
-		//set a control point
-		double mouseX, mouseY;
-		glfwGetCursorPos(window, &mouseX, &mouseY);
-		cout << mouseX << ' ' << mouseY << endl;
-		vec3 pos = InputController::convertTo3DCoordinate(mouseX, mouseY);
-		cout << pos.x << ' ' << pos.y << ' ' << pos.z << endl;
+		//select and move a control point
+
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT &&  action == GLFW_RELEASE)
 	{
-		//clear latest control point
+		//set a control point
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
+		cout << "2D coordinate:" << mouseX << ',' << mouseY << endl;
+		vec2 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
+		cout << "World coordinate:" << world.x << ',' << world.y << endl;
+		vec3 pos = InputController::convertTo3DCoordinate(mouseX, mouseY);
+		cout << "3D coordinate:" << pos.x << ',' << pos.y << ',' << pos.z << endl;
 	}
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE &&  action == GLFW_RELEASE)
 	{
 		//clear all control points
+		Deformation::ClearControlPoints();
 	}
 }
 
@@ -115,6 +119,7 @@ vec3 InputController::convertTo3DCoordinate(double mouseX, double mouseY)
 	int viewport[4];
 	double winX, winY, winZ;
 	double object_x = 0, object_y = 0, object_z = 0;
+			
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
 	glGetDoublev(GL_PROJECTION_MATRIX, projection);
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -123,4 +128,14 @@ vec3 InputController::convertTo3DCoordinate(double mouseX, double mouseY)
 	glReadPixels((GLint)mouseX, (GLint)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
 	gluUnProject((GLdouble)winX, (GLdouble)winY, (GLdouble)winZ, modelview, projection, viewport, &object_x, &object_y, &object_z);
 	return vec3(object_x, object_y, object_z);
+}
+
+vec2 InputController::convertToWorldCoordinate(double mouseX, double mouseY)
+{
+	vec4 translation = vec4(2 * mouseX / SCREEN_WIDTH - 1, -2 * mouseY / SCREEN_HEIGHT + 1, 0, 1);
+	vec4 mappedTranslation = inverse(GetMVP()) * translation;
+
+	double worldX = mappedTranslation.x * mappedTranslation.z / mappedTranslation.w;
+	double worldY = mappedTranslation.y * mappedTranslation.z / mappedTranslation.w;
+	return vec2(worldX, worldY);
 }

@@ -30,6 +30,9 @@
     <ClCompile Include="InputController.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Deformation.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MeshLoader.h">
@@ -45,6 +48,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="InputController.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Deformation.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
