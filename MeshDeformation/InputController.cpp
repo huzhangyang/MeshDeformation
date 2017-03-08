@@ -98,9 +98,9 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 	}
 	// Reset
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		vec3 position = vec3(0, 0, 1);
-		float horizontalAngle = 3.14f;
-		float verticalAngle = 0;
+		position = vec3(0, 0, 1);
+		horizontalAngle = 3.14f;
+		verticalAngle = 0;
 	}
 	// Draw Line
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
@@ -129,8 +129,5 @@ vec3 InputController::convertToWorldCoordinate(double mouseX, double mouseY)
 {
 	vec4 translation = vec4(2 * mouseX / SCREEN_WIDTH - 1, -2 * mouseY / SCREEN_HEIGHT + 1, 0, 1);
 	vec4 mappedTranslation = inverse(GetMVP()) * translation;
-
-	double worldX = mappedTranslation.x * mappedTranslation.z / mappedTranslation.w;
-	double worldY = mappedTranslation.y *mappedTranslation.z / mappedTranslation.w;
-	return vec3(worldX, worldY, 0);
+	return vec3(mappedTranslation.x, mappedTranslation.y, 0);
 }

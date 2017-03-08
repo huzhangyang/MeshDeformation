@@ -70,7 +70,7 @@ int main()
 		glBegin(GL_POINTS);
 		for (int i = 0; i < controlPoints.size(); i++)
 		{
-			vec3 cp = controlPoints[i];
+			vec4 cp = MVP * vec4(controlPoints[i], 1);
 			glVertex3f(cp.x, cp.y, cp.z);
 		}
 		glEnd();
