@@ -11,9 +11,14 @@ static mat4 ProjectionMatrix;
 
 void mouseCallback(GLFWwindow* window, int button, int action, int mods) 
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
+	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_PRESS)
 	{
 		//select and move a control point
+
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
+	{
+		//relocate a control point
 
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT &&  action == GLFW_RELEASE)
@@ -22,9 +27,9 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 		double mouseX, mouseY;
 		glfwGetCursorPos(window, &mouseX, &mouseY);
 		cout << "2D coordinate:" << mouseX << ',' << mouseY << endl;
-		vec2 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
+		vec3 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
 		cout << "World coordinate:" << world.x << ',' << world.y << endl;
-		Deformation::AddControlPoint(vec3(world.x, world.y, 0));
+		Deformation::AddControlPoint(world);
 	}
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE &&  action == GLFW_RELEASE)
 	{
@@ -120,12 +125,12 @@ mat4 InputController::GetMVP()
 	return ProjectionMatrix * ViewMatrix * ModelMatrix;
 }
 
-vec2 InputController::convertToWorldCoordinate(double mouseX, double mouseY)
+vec3 InputController::convertToWorldCoordinate(double mouseX, double mouseY)
 {
 	vec4 translation = vec4(2 * mouseX / SCREEN_WIDTH - 1, -2 * mouseY / SCREEN_HEIGHT + 1, 0, 1);
 	vec4 mappedTranslation = inverse(GetMVP()) * translation;
 
 	double worldX = mappedTranslation.x * mappedTranslation.z / mappedTranslation.w;
-	double worldY = mappedTranslation.y * mappedTranslation.z / mappedTranslation.w;
-	return vec2(worldX, worldY);
+	double worldY = mappedTranslation.y *mappedTranslation.z / mappedTranslation.w;
+	return vec3(worldX, worldY, 0);
 }
