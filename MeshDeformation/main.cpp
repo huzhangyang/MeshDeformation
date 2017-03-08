@@ -5,13 +5,12 @@
 #include "InputController.h"
 #include "Deformation.h"
 
-// The MAIN function, from here we start the application and run the game loop
 int main()
 {
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Mesh", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Mesh Deformation", NULL, NULL);
 	glfwMakeContextCurrent(window);
 	InputController::InitMouseCallback(window);
 
@@ -19,15 +18,13 @@ int main()
 	glewInit();
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glPointSize(8.0f);
 
 	// Load Mesh
 	MeshLoader* meshLoader = new MeshLoader();
-	meshLoader->LoadObj("Rabbit.obj");
+	meshLoader->LoadObj2D("man.obj");
 	auto vertices = meshLoader->GetVertices();
-	auto uvs = meshLoader->GetUVs();
+	//auto uvs = meshLoader->GetUVs();
 
 	// Load Shader
 	GLuint programID = ShaderLoader::LoadShader("vertex.shader", "fragment.shader");
@@ -44,12 +41,12 @@ int main()
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
-	GLuint uvbuffer;
+	/*GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(vec2), &uvs[0], GL_STATIC_DRAW);
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);*/
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -63,22 +60,20 @@ int main()
 		mat4 MVP = InputController::GetMVP();
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
-		// Draw the triangle !
+		// Draw the mesh
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
+		//Visualize control points
 		auto controlPoints = Deformation::GetControlPoints();
-		if (controlPoints.size() > 0)
+		glUseProgram(0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < controlPoints.size(); i++)
 		{
-			/*GLuint cpbuffer;
-			glGenBuffers(1, &cpbuffer);
-			glBindBuffer(GL_ARRAY_BUFFER, cpbuffer);
-			glBufferData(GL_ARRAY_BUFFER, controlPoints.size() * sizeof(vec3), &controlPoints[0], GL_DYNAMIC_DRAW);
-			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_POINTS, 0, controlPoints.size());
-			glDisableVertexAttribArray(2);
-			glDeleteBuffers(1, &cpbuffer);*/
+			vec3 cp = controlPoints[i];
+			glVertex3f(cp.x, cp.y, cp.z);
 		}
+		glEnd();
 
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -87,10 +82,9 @@ int main()
 
 	// Cleanup
 	glDeleteBuffers(1, &vertexbuffer);
-	glDeleteBuffers(1, &uvbuffer);
+	//glDeleteBuffers(1, &uvbuffer);
 	glDeleteProgram(programID);
 	glDeleteTextures(1, &TextureID);
-
 	glfwTerminate();
 	return 0;
 }
