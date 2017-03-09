@@ -9,27 +9,48 @@ float speed = 3.0f;
 static mat4 ViewMatrix;
 static mat4 ProjectionMatrix;
 
+bool movingCP = false;
+
 void mouseCallback(GLFWwindow* window, int button, int action, int mods) 
 {
+	double mouseX, mouseY;
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+	vec3 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
+
 	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_PRESS)
 	{
 		//select and move a control point
-
+		if (!movingCP)
+		{
+			bool found = Deformation::FindNearbyControlPoints(world, 0.1f);
+			if (found)
+			{
+				movingCP = true;
+			}
+		}
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
 	{
-		//relocate a control point
-
+		//place a control point(can't be too close to others)
+		if (movingCP)
+		{
+			bool found = Deformation::FindNearbyControlPoints(world, 0.1f);
+			if (!found)
+			{
+				Deformation::MoveControlPoint(world);
+				//TODO insert deformation here
+			}
+			movingCP = false;
+		}
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT &&  action == GLFW_RELEASE)
 	{
-		//set a control point
-		double mouseX, mouseY;
-		glfwGetCursorPos(window, &mouseX, &mouseY);
-		cout << "2D coordinate:" << mouseX << ',' << mouseY << endl;
-		vec3 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
-		cout << "World coordinate:" << world.x << ',' << world.y << endl;
-		Deformation::AddControlPoint(world);
+		//set a control point(can't be too close to others)
+		bool found = Deformation::FindNearbyControlPoints(world, 0.1f);
+		if (!found)
+		{
+			Deformation::AddControlPoint(world);
+		}
 	}
 	if (button == GLFW_MOUSE_BUTTON_MIDDLE &&  action == GLFW_RELEASE)
 	{
