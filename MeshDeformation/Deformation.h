@@ -2,6 +2,7 @@
 
 #include "global.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include "Eigen/Dense"
 
 class Deformation {
 public:
