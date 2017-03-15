@@ -100,14 +100,13 @@ void Deformation::DeformStepOne()
 			G(2 * k + 1, 2) = 0;
 			G(2 * k + 1, 3) = 1;
 		}
-
 		if (vr == -1)
 		{
-			H = Edge.block<2, 6>(0, 0) - E * ((G.transpose() * G).inverse()) * G.transpose();
+			H = Edge.block<2, 6>(0, 0) - E * ((((G.transpose()*G).inverse())*G.transpose()).block<2, 6>(0, 0));
 		}
 		else
 		{
-			H = Edge - E * ((G.transpose() * G).inverse()) * G.transpose();
+			H = Edge.block<2, 8>(0, 0) - E * ((((G.transpose()*G).inverse())*G.transpose()).block<2, 8>(0, 0));
 		}
 
 		for (int k = 0; k < matrixSize / 2; k++)
