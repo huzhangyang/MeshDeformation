@@ -15,9 +15,7 @@ public:
 	static bool FindNearbyControlPoints(vec3 pos, float searchDis);
 	static void MoveControlPoint(vec3 newPos);
 	static void Deform();
-private:
 	static void InitData();
-	static void DeformStepOne();
-	static void DeformStepTwo();
+private:
 	static void CalculateEdgeNeighbors();
 };

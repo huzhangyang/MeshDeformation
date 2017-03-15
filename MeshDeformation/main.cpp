@@ -24,6 +24,7 @@ int main()
 	MeshLoader::LoadObj2D("man.obj");
 	auto vertices = MeshLoader::GetVertices();
 	//auto uvs = meshLoader->GetUVs();
+	Deformation::InitData();
 
 	// Load Shader
 	GLuint programID = ShaderLoader::LoadShader("vertex.shader", "fragment.shader");

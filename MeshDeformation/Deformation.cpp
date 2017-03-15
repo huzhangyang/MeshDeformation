@@ -51,29 +51,17 @@ void Deformation::MoveControlPoint(vec3 newPos)
 
 void Deformation::Deform()
 {
-	InitData();
-	DeformStepOne();
-	DeformStepTwo();
-}
-
-void Deformation::InitData()
-{
-	vertices = MeshLoader::GetVertices();
-	vertexIndices = MeshLoader::GetVertexIndices();
-
-	CalculateEdgeNeighbors();
-}
-
-void Deformation::DeformStepOne()
-{
 	int w = 1000;
 	MatrixXf A = MatrixXf::Zero((vertexIndices.size() / 3 + 1) * 6, vertices.size() * 2);
 	VectorXf B = VectorXf::Zero((vertexIndices.size() / 3 + 1) * 6);
+	MatrixXf A2 = MatrixXf::Zero(vertexIndices.size() + 3, vertices.size());
+	VectorXf B2x(vertexIndices.size() + 3);
+	VectorXf B2y(vertexIndices.size() + 3);
 	MatrixXf Edge(2, 8);
 	MatrixXf E(2, 2);
 
 	Edge << -1, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0;
-
+	//Similarity Transformation
 	for (int i = 0; i < vertexIndices.size(); i++)
 	{
 		int vi = edgeNeighbors[i][0];
@@ -121,22 +109,75 @@ void Deformation::DeformStepOne()
 	for (int i = 0; i < controlPoints.size(); i++)
 	{
 		B(vertexIndices.size() * 2 + 2 * i) = w * controlPoints[i].x;
-		B(vertexIndices.size() * 2 + 2 * i + 1) = w * controlPoints[i].y; 
+		B(vertexIndices.size() * 2 + 2 * i + 1) = w * controlPoints[i].y;
 		A(vertexIndices.size() * 2 + 2 * i, 2 * i) = (float)w;
 		A(vertexIndices.size() * 2 + 2 * i + 1, 2 * i + 1) = (float)w;
 	}
 	//solve
 	VectorXf newVertices = (A.transpose() * A).llt().solve(A.transpose()*B);
+	//Scale Adjustment
+	for (int i = 0; i < controlPoints.size(); i++)
+	{
+		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
+		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
+		A2(vertexIndices.size() + i, i) = (float)w;
+	}
+	for (int i = 0; i< vertexIndices.size(); i++)
+	{
+		int vi = edgeNeighbors[i][0];
+		int vj = edgeNeighbors[i][1];
+		int vl = edgeNeighbors[i][2];
+		int vr = edgeNeighbors[i][3];
+
+		int matrixSize = vr == -1 ? 6 : 8;// if no vr, matrixLength is 6 instead of 8
+		VectorXf V(matrixSize);
+		MatrixXf G(matrixSize, 4);
+
+		for (int j = 0; j< matrixSize / 2; j++)
+		{
+			V(2 * j) = newVertices(2 * edgeNeighbors[i][j]);
+			V(2 * j + 1) = newVertices(2 * edgeNeighbors[i][j] + 1);
+		}	
+
+		for (int k = 0; k < matrixSize / 2; k++)
+		{
+			G(2 * k, 0) = vertices[edgeNeighbors[i][k]].x;
+			G(2 * k, 1) = vertices[edgeNeighbors[i][k]].y;
+			G(2 * k, 2) = 1;
+			G(2 * k, 3) = 0;
+			G(2 * k + 1, 0) = vertices[edgeNeighbors[i][k]].y;
+			G(2 * k + 1, 1) = -1 * vertices[edgeNeighbors[i][k]].x;
+			G(2 * k + 1, 2) = 0;
+			G(2 * k + 1, 3) = 1;
+		}
+		VectorXf t = G * V;
+		Matrix2f T;
+		T << t(0, 0), t(1, 0), -t(1, 0), t(0, 0);
+		Vector2f E;
+		E << vertices[vj].x - vertices[vi].x, vertices[vj].y - vertices[vi].y;
+		Vector2f TE = T * E / sqrt(t[0] * t[0] + t[1] * t[1]);
+		B2x[i] = TE[0];
+		B2y[i] = TE[1];
+		A2(i, vi) = -1;
+		A2(i, vj) = 1;
+	}
+
+	VectorXf newVx = (A2.transpose() * A2).llt().solve(A2.transpose()*B2x);
+	VectorXf newVy = (A2.transpose() * A2).llt().solve(A2.transpose()*B2y);
 	//assign newVertices
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		vertices[i].x = newVertices[2 * i];
-		vertices[i].y = newVertices[2 * i + 1];
+		vertices[i].x = newVx[i];
+		vertices[i].y = newVy[1];
 	}
 }
 
-void Deformation::DeformStepTwo()
+void Deformation::InitData()
 {
+	vertices = MeshLoader::GetVertices();
+	vertexIndices = MeshLoader::GetVertexIndices();
+
+	CalculateEdgeNeighbors();
 }
 
 void Deformation::CalculateEdgeNeighbors()
