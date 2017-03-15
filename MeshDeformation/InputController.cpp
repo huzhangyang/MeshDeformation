@@ -38,7 +38,7 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 			if (!found)
 			{
 				Deformation::MoveControlPoint(world);
-				//TODO insert deformation here
+				Deformation::Deform();//core deformation function entry here
 			}
 			movingCP = false;
 		}

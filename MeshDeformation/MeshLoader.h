@@ -4,19 +4,12 @@
 
 class MeshLoader {
 public:
-	void LoadObj(string filename);
-	void LoadObj2D(string filename);
-	vector<vec3> GetVertices();
-	vector<vec2> GetUVs();
-	vector<vec3> GetNormals();
+	static void LoadObj(string filename);
+	static void LoadObj2D(string filename);
+	static vector<vec3> GetVertices();
+	static vector<vec2> GetUVs();
+	static vector<vec3> GetNormals();
+	static vector<int> GetVertexIndices();
 private:
-	vector<int> vertexIndices, uvIndices, normalIndices;
-	vector<vec3> temp_vertices;
-	vector<vec2> temp_uvs;
-	vector<vec3> temp_normals;
-	vector<vec3> out_vertices;
-	vector<vec2> out_uvs;
-	vector<vec3> out_normals;
-
-	vector<string> split(string& s, const char* delim);
+	static vector<string> split(string& s, const char* delim);
 };

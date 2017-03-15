@@ -1,5 +1,13 @@
 #include "MeshLoader.h"
 
+static vector<int> vertexIndices, uvIndices, normalIndices;
+static vector<vec3> temp_vertices;
+static vector<vec2> temp_uvs;
+static vector<vec3> temp_normals;
+static vector<vec3> out_vertices;
+static vector<vec2> out_uvs;
+static vector<vec3> out_normals;
+
 void MeshLoader::LoadObj(string filename)
 {
 	ifstream file(filename);
@@ -129,6 +137,11 @@ vector<vec2> MeshLoader::GetUVs()
 vector<vec3> MeshLoader::GetNormals()
 {
 	return out_normals;
+}
+
+vector<int> MeshLoader::GetVertexIndices()
+{
+	return vertexIndices;
 }
 
 vector<string> MeshLoader::split(string& s, const char* delim)

@@ -21,9 +21,8 @@ int main()
 	glPointSize(8.0f);
 
 	// Load Mesh
-	MeshLoader* meshLoader = new MeshLoader();
-	meshLoader->LoadObj2D("man.obj");
-	auto vertices = meshLoader->GetVertices();
+	MeshLoader::LoadObj2D("man.obj");
+	auto vertices = MeshLoader::GetVertices();
 	//auto uvs = meshLoader->GetUVs();
 
 	// Load Shader
