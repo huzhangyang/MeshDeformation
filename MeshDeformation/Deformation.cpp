@@ -51,16 +51,27 @@ void Deformation::MoveControlPoint(vec3 newPos)
 
 void Deformation::Deform()
 {
-	int w = 1000;
-	MatrixXf A = MatrixXf::Zero((vertexIndices.size() / 3 + 1) * 6, vertices.size() * 2);
-	VectorXf B = VectorXf::Zero((vertexIndices.size() / 3 + 1) * 6);
+	float w = 1000.0f;
+	MatrixXf A1 = MatrixXf::Zero((vertexIndices.size() / 3 + 1) * 6, vertices.size() * 2);
+	VectorXf B1 = VectorXf::Zero((vertexIndices.size() / 3 + 1) * 6);
 	MatrixXf A2 = MatrixXf::Zero(vertexIndices.size() + 3, vertices.size());
 	VectorXf B2x(vertexIndices.size() + 3);
 	VectorXf B2y(vertexIndices.size() + 3);
 	MatrixXf Edge(2, 8);
-	MatrixXf E(2, 2);
 
-	Edge << -1, 0, 1, 0, 0, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0, 0;
+	Edge << -1, 0, 1, 0, 0, 0, 0, 0, 
+			0, -1, 0, 1, 0, 0, 0, 0;
+	//fill the lower half of matrix
+	for (int i = 0; i < controlPoints.size(); i++)
+	{
+		A1(2 * vertexIndices.size() + 2 * i, 2 * i) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * i + 1) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		B1(2 * vertexIndices.size() + 2 * i) = w * controlPoints[i].x;
+		B1(2 * vertexIndices.size() + 2 * i + 1) = w * controlPoints[i].y;
+		A2(vertexIndices.size() + i, i) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
+		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
+	}
 	//Similarity Transformation
 	for (int i = 0; i < vertexIndices.size(); i++)
 	{
@@ -71,57 +82,44 @@ void Deformation::Deform()
 
 		float ex = vertices[vj].x - vertices[vi].x;
 		float ey = vertices[vj].y - vertices[vi].y;
+		Matrix2f E;
 		E << ex, ey, ey, -ex;
 
 		int matrixSize = vr == -1 ? 6 : 8;// if no vr, matrixLength is 6 instead of 8
 		MatrixXf G(matrixSize, 4);
 		MatrixXf H(2, matrixSize);
 
-		for (int k = 0; k < matrixSize / 2; k++)
+		for (int j = 0; j < matrixSize / 2; j++)
 		{
-			G(2 * k, 0) = vertices[edgeNeighbors[i][k]].x;
-			G(2 * k, 1) = vertices[edgeNeighbors[i][k]].y;
-			G(2 * k, 2) = 1;
-			G(2 * k, 3) = 0;
-			G(2 * k + 1, 0) = vertices[edgeNeighbors[i][k]].y;
-			G(2 * k + 1, 1) = -1 * vertices[edgeNeighbors[i][k]].x;
-			G(2 * k + 1, 2) = 0;
-			G(2 * k + 1, 3) = 1;
+			G(2 * j, 0) = vertices[edgeNeighbors[i][j]].x;
+			G(2 * j, 1) = vertices[edgeNeighbors[i][j]].y;
+			G(2 * j, 2) = 1;
+			G(2 * j, 3) = 0;
+			G(2 * j + 1, 0) = vertices[edgeNeighbors[i][j]].y;
+			G(2 * j + 1, 1) = -1 * vertices[edgeNeighbors[i][j]].x;
+			G(2 * j + 1, 2) = 0;
+			G(2 * j + 1, 3) = 1;
 		}
 		if (vr == -1)
 		{
-			H = Edge.block<2, 6>(0, 0) - E * ((((G.transpose()*G).inverse())*G.transpose()).block<2, 6>(0, 0));
+			H = Edge.block<2, 6>(0, 0) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 6>(0, 0));
 		}
 		else
 		{
-			H = Edge.block<2, 8>(0, 0) - E * ((((G.transpose()*G).inverse())*G.transpose()).block<2, 8>(0, 0));
+			H = Edge.block<2, 8>(0, 0) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 8>(0, 0));
 		}
 
 		for (int k = 0; k < matrixSize / 2; k++)
 		{
-			A(2 * i, 2 * edgeNeighbors[i][k]) = H(0, 2 * k);
-			A(2 * i, 2 * edgeNeighbors[i][k] + 1) = H(0, 2 * k + 1);
-			A(2 * i + 1, 2 * edgeNeighbors[i][k]) = H(1, 2 * k);
-			A(2 * i + 1, 2 * edgeNeighbors[i][k] + 1) = H(1, 2 * k + 1);
+			A1(2 * i, 2 * edgeNeighbors[i][k]) = H(0, 2 * k);
+			A1(2 * i, 2 * edgeNeighbors[i][k] + 1) = H(0, 2 * k + 1);
+			A1(2 * i + 1, 2 * edgeNeighbors[i][k]) = H(1, 2 * k);
+			A1(2 * i + 1, 2 * edgeNeighbors[i][k] + 1) = H(1, 2 * k + 1);
 		}
 	}
-
-	for (int i = 0; i < controlPoints.size(); i++)
-	{
-		B(vertexIndices.size() * 2 + 2 * i) = w * controlPoints[i].x;
-		B(vertexIndices.size() * 2 + 2 * i + 1) = w * controlPoints[i].y;
-		A(vertexIndices.size() * 2 + 2 * i, 2 * i) = (float)w;
-		A(vertexIndices.size() * 2 + 2 * i + 1, 2 * i + 1) = (float)w;
-	}
-	//solve
-	VectorXf newVertices = (A.transpose() * A).llt().solve(A.transpose()*B);
+	//solve part 1
+	VectorXf newVertices = (A1.transpose() * A1).llt().solve(A1.transpose() * B1);
 	//Scale Adjustment
-	for (int i = 0; i < controlPoints.size(); i++)
-	{
-		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
-		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
-		A2(vertexIndices.size() + i, i) = (float)w;
-	}
 	for (int i = 0; i< vertexIndices.size(); i++)
 	{
 		int vi = edgeNeighbors[i][0];
@@ -150,7 +148,15 @@ void Deformation::Deform()
 			G(2 * k + 1, 2) = 0;
 			G(2 * k + 1, 3) = 1;
 		}
-		VectorXf t = G * V;
+		VectorXf t;
+		if (vr == -1)
+		{
+			t = ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 6>(0, 0)) * V;
+		}
+		else
+		{
+			t = ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 8>(0, 0)) * V;
+		}
 		Matrix2f T;
 		T << t(0, 0), t(1, 0), -t(1, 0), t(0, 0);
 		Vector2f E;
@@ -161,14 +167,14 @@ void Deformation::Deform()
 		A2(i, vi) = -1;
 		A2(i, vj) = 1;
 	}
-
-	VectorXf newVx = (A2.transpose() * A2).llt().solve(A2.transpose()*B2x);
-	VectorXf newVy = (A2.transpose() * A2).llt().solve(A2.transpose()*B2y);
+	//solve part 2
+	VectorXf newVerticesX = (A2.transpose() * A2).llt().solve(A2.transpose()*B2x);
+	VectorXf newVerticesY = (A2.transpose() * A2).llt().solve(A2.transpose()*B2y);
 	//assign newVertices
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		vertices[i].x = newVx[i];
-		vertices[i].y = newVy[1];
+		vertices[i].x = newVerticesX[i];
+		vertices[i].y = newVerticesY[1];
 	}
 }
 
