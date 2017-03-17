@@ -9,7 +9,8 @@ static vector<int[4]> edgeNeighbors;//each vector stores the four neighbors (vi,
 
 void Deformation::AddControlPoint(vec3 point)
 {
-	controlPoints.push_back(point);
+	int vertexIndex = GetNearestVertexIndex(point);
+	controlPoints.push_back(vertices[vertexIndex]);
 }
 
 void Deformation::ClearControlPoints()
@@ -44,7 +45,8 @@ void Deformation::MoveControlPoint(vec3 newPos)
 {
 	if (currentCPIndex >= 0)
 	{
-		controlPoints[currentCPIndex] = newPos;
+		int vertexIndex = GetNearestVertexIndex(newPos);
+		controlPoints[currentCPIndex] = vertices[vertexIndex];
 		currentCPIndex = -1;
 	}
 }
@@ -64,11 +66,12 @@ void Deformation::Deform()
 	//fill the lower half of matrix
 	for (int i = 0; i < controlPoints.size(); i++)
 	{
-		A1(2 * vertexIndices.size() + 2 * i, 2 * i) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
-		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * i + 1) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		int vertexIndex = GetNearestVertexIndex(controlPoints[i]);
+		A1(2 * vertexIndices.size() + 2 * i, 2 * vertexIndex) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * vertexIndex + 1) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
 		B1(2 * vertexIndices.size() + 2 * i) = w * controlPoints[i].x;
 		B1(2 * vertexIndices.size() + 2 * i + 1) = w * controlPoints[i].y;
-		A2(vertexIndices.size() + i, i) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		A2(vertexIndices.size() + i, vertexIndex) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
 		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
 		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
 	}
@@ -234,4 +237,23 @@ void Deformation::CalculateEdgeNeighbors()
 		edgeNeighbors[i][2] = vl;
 		edgeNeighbors[i][3] = vr;
 	}
+}
+
+int Deformation::GetNearestVertexIndex(vec3 point)
+{
+	int index = 0;
+	float minDis = SCREEN_WIDTH * SCREEN_HEIGHT;
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		vec3 vertex = vertices[i];
+
+		float sqrDis = pow(vertex.x - point.x, 2) + pow(vertex.y - point.y, 2) + pow(vertex.z - point.z, 2);
+		if (sqrDis < minDis)
+		{
+			minDis = sqrDis;
+			index = i;
+		}
+	}
+
+	return index;
 }

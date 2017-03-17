@@ -18,4 +18,5 @@ public:
 	static void InitData();
 private:
 	static void CalculateEdgeNeighbors();
+	static int GetNearestVertexIndex(vec3 point);
 };
