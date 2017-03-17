@@ -9,8 +9,7 @@ static vector<int[4]> edgeNeighbors;//each vector stores the four neighbors (vi,
 
 void Deformation::AddControlPoint(vec3 point)
 {
-	int vertexIndex = GetNearestVertexIndex(point);
-	controlPoints.push_back(vertices[vertexIndex]);
+	controlPoints.push_back(point);
 }
 
 void Deformation::ClearControlPoints()
@@ -45,8 +44,7 @@ void Deformation::MoveControlPoint(vec3 newPos)
 {
 	if (currentCPIndex >= 0)
 	{
-		int vertexIndex = GetNearestVertexIndex(newPos);
-		controlPoints[currentCPIndex] = vertices[vertexIndex];
+		controlPoints[currentCPIndex] = newPos;
 		currentCPIndex = -1;
 	}
 }
@@ -66,12 +64,18 @@ void Deformation::Deform()
 	//fill the lower half of matrix
 	for (int i = 0; i < controlPoints.size(); i++)
 	{
-		int vertexIndex = GetNearestVertexIndex(controlPoints[i]);
-		A1(2 * vertexIndices.size() + 2 * i, 2 * vertexIndex) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
-		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * vertexIndex + 1) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		Barycentric bc = GetBarycentricCoordinate(controlPoints[i]);
+		A1(2 * vertexIndices.size() + 2 * i, 2 * bc.v1) = w * bc.w1;
+		A1(2 * vertexIndices.size() + 2 * i, 2 * bc.v2) = w * bc.w2;
+		A1(2 * vertexIndices.size() + 2 * i, 2 * bc.v3) = w * bc.w3;
+		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * bc.v1 + 1) = w * bc.w1;
+		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * bc.v2 + 1) = w * bc.w2;
+		A1(2 * vertexIndices.size() + 2 * i + 1, 2 * bc.v3 + 1) = w * bc.w3;
 		B1(2 * vertexIndices.size() + 2 * i) = w * controlPoints[i].x;
 		B1(2 * vertexIndices.size() + 2 * i + 1) = w * controlPoints[i].y;
-		A2(vertexIndices.size() + i, vertexIndex) = w;//TODO: Allowing Handles on Arbitrary Positions in the Mesh
+		A2(vertexIndices.size() + i, bc.v1) = w * bc.w1;
+		A2(vertexIndices.size() + i, bc.v2) = w * bc.w2;
+		A2(vertexIndices.size() + i, bc.v3) = w * bc.w3;
 		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
 		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
 	}
@@ -256,4 +260,44 @@ int Deformation::GetNearestVertexIndex(vec3 point)
 	}
 
 	return index;
+}
+
+Barycentric Deformation::GetBarycentricCoordinate(vec3 point)
+{
+	Barycentric ret;
+	for (int i = 0; i < vertexIndices.size(); i += 3)
+	{
+		vec3 A = vertices[vertexIndices[i]];
+		vec3 B = vertices[vertexIndices[i + 1]];
+		vec3 C = vertices[vertexIndices[i + 2]];
+
+		vec3 v0 = B - A;
+		vec3 v1 = C - A;
+		vec3 v2 = point - A;
+
+		float d00 = dot(v0, v0);
+		float d01 = dot(v0, v1);
+		float d11 = dot(v1, v1);
+		float d20 = dot(v2, v0);
+		float d21 = dot(v2, v1);
+		float denom = d00 * d11 - d01 * d01;
+
+		float w2 = (d11 * d20 - d01 * d21) / denom;
+		float w3 = (d00 * d21 - d01 * d20) / denom;
+		float w1 = 1.0f - w2 - w3;
+
+		ret.w1 = w1;
+		ret.w2 = w2;
+		ret.w3 = w3;
+		ret.v1 = vertexIndices[i];
+		ret.v2 = vertexIndices[i + 1];
+		ret.v3 = vertexIndices[i + 2];
+
+		if (w1 >= 0 && w1 <= 1 && w2 >= 0 && w2 <= 1 && w1 + w2 <= 1)
+		{
+			break;//point is inside the triangle(or on the edge or vertex)
+		}
+
+	}
+	return ret;
 }

@@ -7,6 +7,16 @@
 
 using namespace Eigen;
 
+struct Barycentric
+{
+	float w1;
+	int v1;
+	float w2;
+	int v2;
+	float w3;
+	int v3;
+};
+
 class Deformation {
 public:
 	static void AddControlPoint(vec3 point);
@@ -19,4 +29,5 @@ public:
 private:
 	static void CalculateEdgeNeighbors();
 	static int GetNearestVertexIndex(vec3 point);
+	static Barycentric GetBarycentricCoordinate(vec3 point);
 };
