@@ -286,16 +286,15 @@ Barycentric Deformation::GetBarycentricCoordinate(vec3 point)
 		float w3 = (d00 * d21 - d01 * d20) / denom;
 		float w1 = 1.0f - w2 - w3;
 
-		ret.w1 = w1;
-		ret.w2 = w2;
-		ret.w3 = w3;
-		ret.v1 = vertexIndices[i];
-		ret.v2 = vertexIndices[i + 1];
-		ret.v3 = vertexIndices[i + 2];
-
-		if (w1 >= 0 && w1 <= 1 && w2 >= 0 && w2 <= 1 && w1 + w2 <= 1)
-		{
-			break;//point is inside the triangle(or on the edge or vertex)
+		if (w1 >= 0 && w1 <= 1 && w2 >= 0 && w2 <= 1 && w3 >= 0 && w3 <= 1)
+		{//point is inside the triangle(or on its edge or vertex)
+			ret.w1 = w1;
+			ret.w2 = w2;
+			ret.w3 = w3;
+			ret.v1 = vertexIndices[i];
+			ret.v2 = vertexIndices[i + 1];
+			ret.v3 = vertexIndices[i + 2];
+			break;
 		}
 
 	}
