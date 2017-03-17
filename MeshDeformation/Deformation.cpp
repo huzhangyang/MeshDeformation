@@ -52,11 +52,11 @@ void Deformation::MoveControlPoint(vec3 newPos)
 void Deformation::Deform()
 {
 	float w = 1000.0f;
-	MatrixXf A1 = MatrixXf::Zero((vertexIndices.size() / 3 + 1) * 6, vertices.size() * 2);
-	VectorXf B1 = VectorXf::Zero((vertexIndices.size() / 3 + 1) * 6);
-	MatrixXf A2 = MatrixXf::Zero(vertexIndices.size() + 3, vertices.size());
-	VectorXf B2x(vertexIndices.size() + 3);
-	VectorXf B2y(vertexIndices.size() + 3);
+	MatrixXf A1 = MatrixXf::Zero(2 * vertexIndices.size() + 2 * controlPoints.size(), 2 * vertices.size());
+	VectorXf B1 = VectorXf::Zero(2 * vertexIndices.size() + 2 * controlPoints.size());
+	MatrixXf A2 = MatrixXf::Zero(vertexIndices.size() + controlPoints.size(), vertices.size());
+	VectorXf B2x(vertexIndices.size() + controlPoints.size());
+	VectorXf B2y(vertexIndices.size() + controlPoints.size());
 	MatrixXf Edge(2, 8);
 
 	Edge << -1, 0, 1, 0, 0, 0, 0, 0, 
