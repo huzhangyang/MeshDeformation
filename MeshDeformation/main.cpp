@@ -22,7 +22,7 @@ int main()
 
 	// Load Mesh
 	MeshLoader::LoadObj2D("man.obj");
-	auto vertices = MeshLoader::GetVertices();
+	auto vertices = MeshLoader::GetVertices()[0];
 	//auto uvs = meshLoader->GetUVs();
 	Deformation::InitData();
 

@@ -102,9 +102,9 @@ void MeshLoader::LoadObj2D(string filename)
 			{
 				int v1, v2, v3;
 				file >> v1 >> v2 >> v3;
-				vertexIndices.push_back(v1);
-				vertexIndices.push_back(v2);
-				vertexIndices.push_back(v3);
+				vertexIndices.push_back(v1 - 1);
+				vertexIndices.push_back(v2 - 1);
+				vertexIndices.push_back(v3 - 1);
 			}
 		}
 
@@ -113,7 +113,7 @@ void MeshLoader::LoadObj2D(string filename)
 		for (unsigned int i = 0; i< vertexIndices.size(); i++)
 		{
 			unsigned int vertexIndex = vertexIndices[i];
-			vec3 vertex = temp_vertices[vertexIndex - 1];
+			vec3 vertex = temp_vertices[vertexIndex];
 			out_vertices.push_back(vertex);
 		}
 	}
@@ -124,24 +124,24 @@ void MeshLoader::LoadObj2D(string filename)
 	}
 }
 
-vector<vec3> MeshLoader::GetVertices()
+vector<vec3>* MeshLoader::GetVertices()
 {
-	return out_vertices;
+	return &out_vertices;
 }
 
-vector<vec2> MeshLoader::GetUVs()
+vector<vec2>* MeshLoader::GetUVs()
 {
-	return out_uvs;
+	return &out_uvs;
 }
 
-vector<vec3> MeshLoader::GetNormals()
+vector<vec3>* MeshLoader::GetNormals()
 {
-	return out_normals;
+	return &out_normals;
 }
 
-vector<int> MeshLoader::GetVertexIndices()
+vector<int>* MeshLoader::GetVertexIndices()
 {
-	return vertexIndices;
+	return &vertexIndices;
 }
 
 vector<string> MeshLoader::split(string& s, const char* delim)
