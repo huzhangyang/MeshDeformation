@@ -26,6 +26,7 @@ public:
 	static void MoveControlPoint(vec3 newPos);
 	static void Deform();
 	static void InitData();
+	static void Reset();
 private:
 	static void CalculateEdgeNeighbors();
 	static int GetNearestVertexIndex(vec3 point);

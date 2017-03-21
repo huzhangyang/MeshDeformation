@@ -122,9 +122,7 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 		position = vec3(0, 0, 1);
 		horizontalAngle = 3.14f;
 		verticalAngle = 0;
-
-		MeshLoader::ResetVertices();
-		Deformation::ClearControlPoints();
+		Deformation::Reset();
 	}
 	// Draw Line
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {

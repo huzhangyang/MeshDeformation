@@ -184,6 +184,13 @@ void Deformation::InitData()
 	CalculateEdgeNeighbors();
 }
 
+void Deformation::Reset()
+{
+	MeshLoader::ResetVertices();
+	ClearControlPoints();
+	vertices = MeshLoader::GetVertices()[0];
+}
+
 void Deformation::CalculateEdgeNeighbors()
 {
 	edgeNeighbors = vector<int[4]>(vertexIndices.size());

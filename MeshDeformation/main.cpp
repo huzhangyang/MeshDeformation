@@ -59,11 +59,10 @@ int main()
 
 		// Draw the mesh
 		auto vertices = MeshLoader::GetSequencedVertices()[0];
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_DYNAMIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+		glDrawArrays(GL_TRIANGLES, 0, (GLsizei)vertices.size());
 
 		//Visualize control points
 		auto controlPoints = Deformation::GetControlPoints();
