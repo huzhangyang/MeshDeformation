@@ -22,7 +22,7 @@ int main()
 
 	// Load Mesh
 	MeshLoader::LoadObj2D("man.obj");
-	auto vertices = MeshLoader::GetVertices()[0];
+	//auto vertices = MeshLoader::GetVertices()[0];
 	//auto uvs = meshLoader->GetUVs();
 	Deformation::InitData();
 
@@ -37,9 +37,6 @@ int main()
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	/*GLuint uvbuffer;
 	glGenBuffers(1, &uvbuffer);
@@ -61,6 +58,11 @@ int main()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		// Draw the mesh
+		auto vertices = MeshLoader::GetVertices()[0];
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_DYNAMIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 		glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
 		//Visualize control points

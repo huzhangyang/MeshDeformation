@@ -109,13 +109,6 @@ void MeshLoader::LoadObj2D(string filename)
 		}
 
 		cout << "File Read Complete." << endl;
-
-		for (unsigned int i = 0; i< vertexIndices.size(); i++)
-		{
-			unsigned int vertexIndex = vertexIndices[i];
-			vec3 vertex = temp_vertices[vertexIndex];
-			out_vertices.push_back(vertex);
-		}
 	}
 	else
 	{
@@ -124,9 +117,29 @@ void MeshLoader::LoadObj2D(string filename)
 	}
 }
 
+void MeshLoader::OverrideVertices(vector<vec3> vertices)
+{
+	for (int i = 0; i < vertices.size(); i++)
+	{
+		temp_vertices[i] = vertices[i];
+	}
+}
+
 vector<vec3>* MeshLoader::GetVertices()
 {
+	out_vertices.clear();
+	for (unsigned int i = 0; i< vertexIndices.size(); i++)
+	{
+		unsigned int vertexIndex = vertexIndices[i];
+		vec3 vertex = temp_vertices[vertexIndex];
+		out_vertices.push_back(vertex);
+	}
 	return &out_vertices;
+}
+
+vector<vec3>* MeshLoader::GetVerticesList()
+{
+	return &temp_vertices;
 }
 
 vector<vec2>* MeshLoader::GetUVs()

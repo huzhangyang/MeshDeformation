@@ -6,7 +6,9 @@ class MeshLoader {
 public:
 	static void LoadObj(string filename);
 	static void LoadObj2D(string filename);
+	static void OverrideVertices(vector<vec3> vertices);
 	static vector<vec3>* GetVertices();
+	static vector<vec3>* GetVerticesList();
 	static vector<vec2>* GetUVs();
 	static vector<vec3>* GetNormals();
 	static vector<int>* GetVertexIndices();

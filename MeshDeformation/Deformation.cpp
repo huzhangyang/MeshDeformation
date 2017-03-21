@@ -107,14 +107,7 @@ void Deformation::Deform()
 			G(2 * j + 1, 2) = 0;
 			G(2 * j + 1, 3) = 1;
 		}
-		if (vr == -1)
-		{
-			H = Edge.block<2, 6>(0, 0) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 6>(0, 0));
-		}
-		else
-		{
-			H = Edge.block<2, 8>(0, 0) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 8>(0, 0));
-		}
+		H = Edge.block(0, 0, 2, matrixSize) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block(0, 0, 2 , matrixSize));
 
 		for (int j = 0; j < matrixSize / 2; j++)
 		{
@@ -155,15 +148,8 @@ void Deformation::Deform()
 			G(2 * j + 1, 2) = 0;
 			G(2 * j + 1, 3) = 1;
 		}
-		VectorXf t;
-		if (vr == -1)
-		{
-			t = ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 6>(0, 0)) * V;
-		}
-		else
-		{
-			t = ((((G.transpose() * G).inverse()) * G.transpose()).block<2, 8>(0, 0)) * V;
-		}
+		VectorXf t = ((((G.transpose() * G).inverse()) * G.transpose()).block(0, 0, 2, matrixSize)) * V;
+
 		Matrix2f T;
 		T << t(0, 0), t(1, 0), -t(1, 0), t(0, 0);
 		Vector2f E;
@@ -183,11 +169,12 @@ void Deformation::Deform()
 		vertices[i].x = newVerticesX[i];
 		vertices[i].y = newVerticesY[i];
 	}
+	MeshLoader::OverrideVertices(vertices);
 }
 
 void Deformation::InitData()
 {
-	vertices = MeshLoader::GetVertices()[0];
+	vertices = MeshLoader::GetVerticesList()[0];
 	vertexIndices = MeshLoader::GetVertexIndices()[0];
 
 	CalculateEdgeNeighbors();
