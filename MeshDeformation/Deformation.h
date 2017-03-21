@@ -24,6 +24,7 @@ public:
 	static vector<vec3> GetControlPoints();
 	static bool FindNearbyControlPoints(vec3 pos, float searchDis);
 	static void MoveControlPoint(vec3 newPos);
+	static void StopMovingControlPoint();
 	static void Deform();
 	static void InitData();
 	static void Reset();

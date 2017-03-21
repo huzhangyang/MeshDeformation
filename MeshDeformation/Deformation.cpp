@@ -49,8 +49,12 @@ void Deformation::MoveControlPoint(vec3 newPos)
 	if (currentCPIndex >= 0)
 	{
 		controlPoints[currentCPIndex] = newPos;
-		currentCPIndex = -1;
 	}
+}
+
+void Deformation::StopMovingControlPoint()
+{
+	currentCPIndex = -1;
 }
 
 void Deformation::Deform()

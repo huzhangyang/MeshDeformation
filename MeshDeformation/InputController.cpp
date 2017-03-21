@@ -31,17 +31,8 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT &&  action == GLFW_RELEASE) 
 	{
-		//place a control point(can't be too close to others)
-		if (movingCP)
-		{
-			bool found = Deformation::FindNearbyControlPoints(world, 0.1f);
-			if (!found)
-			{
-				Deformation::MoveControlPoint(world);
-				Deformation::Deform();//core deformation function entry here
-			}
-			movingCP = false;
-		}
+		movingCP = false;
+		Deformation::StopMovingControlPoint();
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT &&  action == GLFW_RELEASE)
 	{
@@ -139,6 +130,18 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 
 	// For the next frame, the "last time" will be "now"
 	lastTime = currentTime;
+}
+
+void InputController::HandleDeformation(GLFWwindow* window)
+{
+	if (movingCP)
+	{
+		double mouseX, mouseY;
+		glfwGetCursorPos(window, &mouseX, &mouseY);
+		vec3 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
+		Deformation::MoveControlPoint(world);
+		Deformation::Deform();//core deformation function entry here
+	}
 }
 
 mat4 InputController::GetMVP()

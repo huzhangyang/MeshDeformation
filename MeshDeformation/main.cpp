@@ -56,6 +56,9 @@ int main()
 		InputController::ComputeMatricesFromInputs(window);
 		mat4 MVP = InputController::GetMVP();
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		
+		//Handle Real-time deformation
+		InputController::HandleDeformation(window);
 
 		// Draw the mesh
 		auto vertices = MeshLoader::GetSequencedVertices()[0];
