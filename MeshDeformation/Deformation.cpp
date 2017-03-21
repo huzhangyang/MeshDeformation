@@ -9,7 +9,11 @@ static vector<int[4]> edgeNeighbors;//each vector stores the four neighbors (vi,
 
 void Deformation::AddControlPoint(vec3 point)
 {
-	controlPoints.push_back(point);
+	Barycentric bc = GetBarycentricCoordinate(point);
+	if (bc.v1 != 0)// point is inside the mesh
+	{
+		controlPoints.push_back(point);
+	}		
 }
 
 void Deformation::ClearControlPoints()
@@ -281,9 +285,9 @@ Barycentric Deformation::GetBarycentricCoordinate(vec3 point)
 			ret.v1 = vertexIndices[i];
 			ret.v2 = vertexIndices[i + 1];
 			ret.v3 = vertexIndices[i + 2];
-			break;
+			return ret;
 		}
-
 	}
+	cout << "Warning: No Barycentric Coordinate Found For Point " << point.x << "," << point.y << "," << point.z << endl;
 	return ret;
 }

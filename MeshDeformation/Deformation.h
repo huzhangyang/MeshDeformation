@@ -9,12 +9,12 @@ using namespace Eigen;
 
 struct Barycentric
 {
-	float w1;
-	int v1;
-	float w2;
-	int v2;
-	float w3;
-	int v3;
+	float w1 = 0.0f;
+	int v1 = 0;
+	float w2 = 0.0f;
+	int v2 = 0;
+	float w3 = 0.0f;
+	int v3 = 0;
 };
 
 class Deformation {
