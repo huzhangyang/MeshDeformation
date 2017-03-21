@@ -22,7 +22,7 @@ int main()
 
 	// Load Mesh
 	MeshLoader::LoadObj2D("man.obj");
-	//auto vertices = MeshLoader::GetVertices()[0];
+	//auto vertices = MeshLoader::GetSequencedVertices()[0];
 	//auto uvs = meshLoader->GetUVs();
 	Deformation::InitData();
 
@@ -58,7 +58,7 @@ int main()
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 		// Draw the mesh
-		auto vertices = MeshLoader::GetVertices()[0];
+		auto vertices = MeshLoader::GetSequencedVertices()[0];
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vec3), &vertices[0], GL_DYNAMIC_DRAW);
 		glEnableVertexAttribArray(0);

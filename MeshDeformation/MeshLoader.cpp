@@ -1,12 +1,14 @@
 #include "MeshLoader.h"
 
 static vector<int> vertexIndices, uvIndices, normalIndices;
-static vector<vec3> temp_vertices;
-static vector<vec2> temp_uvs;
-static vector<vec3> temp_normals;
-static vector<vec3> out_vertices;
-static vector<vec2> out_uvs;
-static vector<vec3> out_normals;
+static vector<vec3> rawVertices;
+static vector<vec2> rawUVs;
+static vector<vec3> rawNormals;
+static vector<vec3> outVertices;
+static vector<vec2> outUVs;
+static vector<vec3> outNormals;
+
+static vector<vec3> currentVertices;
 
 void MeshLoader::LoadObj(string filename)
 {
@@ -23,20 +25,20 @@ void MeshLoader::LoadObj(string filename)
 			{
 				vec3 vertex;
 				file >> vertex.x >> vertex.y >> vertex.z;
-				temp_vertices.push_back(vertex);
+				rawVertices.push_back(vertex);
 			}
 			else if (header.compare("vt") == 0)
 			{
 				vec2 uv;
 				file >> uv.x >> uv.y;
 				uv.y = -uv.y; //need this?
-				temp_uvs.push_back(uv);
+				rawUVs.push_back(uv);
 			}
 			else if (header.compare("vn") == 0)
 			{
 				vec3 normal;
 				file >> normal.x >> normal.y >> normal.z;
-				temp_normals.push_back(normal);
+				rawNormals.push_back(normal);
 			}
 			else if (header.compare("f") == 0)
 			{
@@ -65,13 +67,13 @@ void MeshLoader::LoadObj(string filename)
 			unsigned int uvIndex = uvIndices[i];
 			unsigned int normalIndex = normalIndices[i];
 
-			vec3 vertex = temp_vertices[vertexIndex - 1];
-			vec2 uv = temp_uvs[uvIndex - 1];
-			vec3 normal = temp_normals[normalIndex - 1];
+			vec3 vertex = rawVertices[vertexIndex - 1];
+			vec2 uv = rawUVs[uvIndex - 1];
+			vec3 normal = rawNormals[normalIndex - 1];
 
-			out_vertices.push_back(vertex);
-			out_uvs.push_back(uv);
-			out_normals.push_back(normal);
+			outVertices.push_back(vertex);
+			outUVs.push_back(uv);
+			outNormals.push_back(normal);
 		}
 	}
 	else
@@ -96,7 +98,7 @@ void MeshLoader::LoadObj2D(string filename)
 			{
 				vec3 vertex;
 				file >> vertex.x >> vertex.y >> vertex.z;
-				temp_vertices.push_back(vertex);
+				rawVertices.push_back(vertex);
 			}
 			else if (header.compare("f") == 0)
 			{
@@ -107,6 +109,8 @@ void MeshLoader::LoadObj2D(string filename)
 				vertexIndices.push_back(v3 - 1);
 			}
 		}
+
+		ResetVertices();
 
 		cout << "File Read Complete." << endl;
 	}
@@ -119,37 +123,54 @@ void MeshLoader::LoadObj2D(string filename)
 
 void MeshLoader::OverrideVertices(vector<vec3> vertices)
 {
+	currentVertices.clear();
+	outVertices.clear();
 	for (int i = 0; i < vertices.size(); i++)
 	{
-		temp_vertices[i] = vertices[i];
+		currentVertices.push_back(vertices[i]);
 	}
+	for (unsigned int i = 0; i< vertexIndices.size(); i++)
+	{
+		unsigned int vertexIndex = vertexIndices[i];
+		vec3 vertex = currentVertices[vertexIndex];
+		outVertices.push_back(vertex);
+	}
+}
+
+void MeshLoader::ResetVertices()
+{
+	currentVertices.clear();
+	outVertices.clear();
+	for (int i = 0; i < rawVertices.size(); i++)
+	{
+		currentVertices.push_back(rawVertices[i]);
+	}
+	for (unsigned int i = 0; i< vertexIndices.size(); i++)
+	{
+		unsigned int vertexIndex = vertexIndices[i];
+		vec3 vertex = currentVertices[vertexIndex];
+		outVertices.push_back(vertex);
+	}
+}
+
+vector<vec3>* MeshLoader::GetSequencedVertices()
+{
+	return &outVertices;
 }
 
 vector<vec3>* MeshLoader::GetVertices()
 {
-	out_vertices.clear();
-	for (unsigned int i = 0; i< vertexIndices.size(); i++)
-	{
-		unsigned int vertexIndex = vertexIndices[i];
-		vec3 vertex = temp_vertices[vertexIndex];
-		out_vertices.push_back(vertex);
-	}
-	return &out_vertices;
-}
-
-vector<vec3>* MeshLoader::GetVerticesList()
-{
-	return &temp_vertices;
+	return &currentVertices;
 }
 
 vector<vec2>* MeshLoader::GetUVs()
 {
-	return &out_uvs;
+	return &outUVs;
 }
 
 vector<vec3>* MeshLoader::GetNormals()
 {
-	return &out_normals;
+	return &outNormals;
 }
 
 vector<int>* MeshLoader::GetVertexIndices()

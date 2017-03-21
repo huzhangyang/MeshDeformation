@@ -174,7 +174,7 @@ void Deformation::Deform()
 
 void Deformation::InitData()
 {
-	vertices = MeshLoader::GetVerticesList()[0];
+	vertices = MeshLoader::GetVertices()[0];
 	vertexIndices = MeshLoader::GetVertexIndices()[0];
 
 	CalculateEdgeNeighbors();
