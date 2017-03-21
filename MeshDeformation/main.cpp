@@ -7,12 +7,18 @@
 
 int main()
 {
+	// Input Filename
+	cout << "Welcome to Mesh Deformation. Please input the obj file name ('.obj' not needed):" << endl;
+	string filename;
+	cin >> filename;
+	filename.append(".obj");
+
 	// Init GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Mesh Deformation", NULL, NULL);
 	glfwMakeContextCurrent(window);
-	InputController::InitMouseCallback(window);
+	InputController::InitCallback(window);
 
 	// Init GLEW
 	glewInit();
@@ -21,7 +27,7 @@ int main()
 	glPointSize(8.0f);
 
 	// Load Mesh
-	MeshLoader::LoadObj2D("man.obj");
+	MeshLoader::LoadObj2D(filename);
 	//auto vertices = MeshLoader::GetSequencedVertices()[0];
 	//auto uvs = meshLoader->GetUVs();
 	Deformation::InitData();

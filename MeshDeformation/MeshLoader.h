@@ -8,6 +8,7 @@ public:
 	static void LoadObj2D(string filename);
 	static void OverrideVertices(vector<vec3> vertices);
 	static void ResetVertices();
+	static void SaveCurrentMesh();
 	static vector<vec3>* GetSequencedVertices();
 	static vector<vec3>* GetVertices();
 	static vector<vec2>* GetUVs();

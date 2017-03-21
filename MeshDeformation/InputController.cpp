@@ -50,9 +50,33 @@ void mouseCallback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
-void InputController::InitMouseCallback(GLFWwindow * window)
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	// Reset
+	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
+		position = vec3(0, 0, 1);
+		horizontalAngle = 3.14f;
+		verticalAngle = 0;
+		Deformation::Reset();
+	}
+	// Save
+	if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+		MeshLoader::SaveCurrentMesh();
+	}
+	// Draw Line
+	if (key == GLFW_KEY_Q && action == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	// Fill
+	if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+}
+
+void InputController::InitCallback(GLFWwindow * window)
 {
 	glfwSetMouseButtonCallback(window, mouseCallback);
+	glfwSetKeyCallback(window, keyCallback);
 }
 
 void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
@@ -107,21 +131,6 @@ void InputController::ComputeMatricesFromInputs(GLFWwindow* window)
 	// Strafe left
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 		position -= right * deltaTime * speed;
-	}
-	// Reset
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		position = vec3(0, 0, 1);
-		horizontalAngle = 3.14f;
-		verticalAngle = 0;
-		Deformation::Reset();
-	}
-	// Draw Line
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	// Fill
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
 	float FoV = fov;// - 5 * glfwGetMouseWheel();

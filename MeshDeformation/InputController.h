@@ -6,7 +6,7 @@
 
 class InputController {
 public:
-	static void InitMouseCallback(GLFWwindow* window);
+	static void InitCallback(GLFWwindow* window);
 	static void ComputeMatricesFromInputs(GLFWwindow* window);
 	static void HandleDeformation(GLFWwindow* window);
 	static mat4 GetMVP();
