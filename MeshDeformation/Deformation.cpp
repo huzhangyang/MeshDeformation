@@ -48,6 +48,7 @@ void Deformation::MoveControlPoint(vec3 newPos)
 {
 	if (currentCPIndex >= 0)
 	{
+		Deform(newPos);//core deformation function entry here
 		controlPoints[currentCPIndex] = newPos;
 	}
 }
@@ -57,7 +58,7 @@ void Deformation::StopMovingControlPoint()
 	currentCPIndex = -1;
 }
 
-void Deformation::Deform()
+void Deformation::Deform(vec3 goalPos)
 {
 	float w = 1000.0f;
 	MatrixXf A1 = MatrixXf::Zero(2 * vertexIndices.size() + 2 * controlPoints.size(), 2 * vertices.size());
@@ -87,6 +88,12 @@ void Deformation::Deform()
 		B2x(vertexIndices.size() + i) = w * controlPoints[i].x;
 		B2y(vertexIndices.size() + i) = w * controlPoints[i].y;
 	}
+	//handle goalPos specifically
+	B1(2 * vertexIndices.size() + 2 * currentCPIndex) = w * goalPos.x;
+	B1(2 * vertexIndices.size() + 2 * currentCPIndex + 1) = w * goalPos.y;
+	B2x(vertexIndices.size() + currentCPIndex) = w * goalPos.x;
+	B2y(vertexIndices.size() + currentCPIndex) = w * goalPos.y;
+	
 	//Similarity Transformation
 	for (int i = 0; i < vertexIndices.size(); i++)
 	{

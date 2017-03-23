@@ -149,7 +149,6 @@ void InputController::HandleDeformation(GLFWwindow* window)
 		glfwGetCursorPos(window, &mouseX, &mouseY);
 		vec3 world = InputController::convertToWorldCoordinate(mouseX, mouseY);
 		Deformation::MoveControlPoint(world);
-		Deformation::Deform();//core deformation function entry here
 	}
 }
 

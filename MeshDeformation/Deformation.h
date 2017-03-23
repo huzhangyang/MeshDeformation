@@ -25,10 +25,10 @@ public:
 	static bool FindNearbyControlPoints(vec3 pos, float searchDis);
 	static void MoveControlPoint(vec3 newPos);
 	static void StopMovingControlPoint();
-	static void Deform();
 	static void InitData();
 	static void Reset();
 private:
+	static void Deform(vec3 goalPos);
 	static void CalculateEdgeNeighbors();
 	static int GetNearestVertexIndex(vec3 point);
 	static Barycentric GetBarycentricCoordinate(vec3 point);
