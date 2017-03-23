@@ -107,22 +107,22 @@ void Deformation::Deform(vec3 goalPos)
 		Matrix2f E;
 		E << ex, ey, ey, -ex;
 
-		int matrixSize = vr == -1 ? 6 : 8;// if no vr, matrixLength is 6 instead of 8
-		MatrixXf G(matrixSize, 4);
+		int matrixSize = vr == -1 ? 6 : 8;// if no vr, matrixSize is 6 instead of 8
+		MatrixXf G(matrixSize, 2);
 		MatrixXf H(2, matrixSize);
 
 		for (int j = 0; j < matrixSize / 2; j++)
 		{
 			G(2 * j, 0) = vertices[edgeNeighbors[i][j]].x;
 			G(2 * j, 1) = vertices[edgeNeighbors[i][j]].y;
-			G(2 * j, 2) = 1;
-			G(2 * j, 3) = 0;
+			//G(2 * j, 2) = 1;
+			//G(2 * j, 3) = 0;
 			G(2 * j + 1, 0) = vertices[edgeNeighbors[i][j]].y;
 			G(2 * j + 1, 1) = -vertices[edgeNeighbors[i][j]].x;
-			G(2 * j + 1, 2) = 0;
-			G(2 * j + 1, 3) = 1;
+			//G(2 * j + 1, 2) = 0;
+			//G(2 * j + 1, 3) = 1;
 		}
-		H = Edge.block(0, 0, 2, matrixSize) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block(0, 0, 2 , matrixSize));
+		H = Edge.block(0, 0, 2, matrixSize) - E * ((((G.transpose() * G).inverse()) * G.transpose()).block(0, 0, 2, matrixSize));
 
 		for (int j = 0; j < matrixSize / 2; j++)
 		{
@@ -144,7 +144,7 @@ void Deformation::Deform(vec3 goalPos)
 
 		int matrixSize = vr == -1 ? 6 : 8;// if no vr, matrixLength is 6 instead of 8
 		VectorXf V(matrixSize);
-		MatrixXf G(matrixSize, 4);
+		MatrixXf G(matrixSize, 2);
 
 		for (int j = 0; j < matrixSize / 2; j++)
 		{
@@ -156,12 +156,12 @@ void Deformation::Deform(vec3 goalPos)
 		{
 			G(2 * j, 0) = vertices[edgeNeighbors[i][j]].x;
 			G(2 * j, 1) = vertices[edgeNeighbors[i][j]].y;
-			G(2 * j, 2) = 1;
-			G(2 * j, 3) = 0;
+			//G(2 * j, 2) = 1;
+			//G(2 * j, 3) = 0;
 			G(2 * j + 1, 0) = vertices[edgeNeighbors[i][j]].y;
 			G(2 * j + 1, 1) = -1 * vertices[edgeNeighbors[i][j]].x;
-			G(2 * j + 1, 2) = 0;
-			G(2 * j + 1, 3) = 1;
+			//G(2 * j + 1, 2) = 0;
+			//G(2 * j + 1, 3) = 1;
 		}
 		VectorXf t = ((((G.transpose() * G).inverse()) * G.transpose()).block(0, 0, 2, matrixSize)) * V;
 
